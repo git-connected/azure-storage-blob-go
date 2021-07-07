@@ -1,0 +1,127 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+#
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+#
+# ******** NOTE ********
+# We have attempted to detect the languages in your repository. Please check
+# the `language` matrix defined below to confirm you have the correct set of
+# supported CodeQL languages.
+#
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ master ]
+  schedule:
+    - cron: '38 3 * * 6'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'go' ]
+        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
+        # Learn more:
+        # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: ${{ matrix.language }}
+        # If you wish to specify custom queries, you can do so here or in a config file.
+        # By default, queries listed here will override any specified in a config file.
+        # Prefix the list here with "+" to use these queries and those in the config file.
+        # queries: ./path/to/local/query, your-org/your-repo/queries@main
+
+    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
+    # If this step fails, then you should remove it and run the build manually (see below)
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v1
+
+    # ℹ️ Command-line programs to run using the OS shell.
+    # 📚 https://git.io/JvXDl
+
+    # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
+    #    and modify them (or add more) to build your code if your project
+    #    uses a compiled language
+
+    #- run: |
+    #   make bootstrap
+    #   make release
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
+      
+      - name: First interaction
+  uses: actions/first-interaction@v1.1.0
+  with:
+    # Token for the repository. Can be passed in using {{ secrets.GITHUB_TOKEN }}
+    repo-token: 
+    # Comment to post on an individual's first issue
+    issue-message: # optional
+    # Comment to post on an individual's first pull request
+    pr-message: # optional
+    
+    - name: Setup Go environment
+  uses: actions/setup-go@v2.1.3
+  with:
+    # The Go version to download (if necessary) and use. Supports semver spec and ranges.
+    go-version: # optional
+    # Whether to download only stable versions
+    stable: # optional, default is true
+    # Used to pull node distributions from go-versions.  Since there's a default, this is typically not supplied by the user.
+    token: # optional, default is ${{ github.token }}
+    
+    - name: Download a Build Artifact
+  uses: actions/download-artifact@v2.0.10
+  with:
+    # Artifact name
+    name: # optional
+    # Destination path
+    path: # optional
+    
+    - name: Terraform Apply for GorillaStack
+  # You may pin to the exact commit or the version.
+  # uses: GorillaStack/github-action-apply-on-merge@71fab58db0a839b1e9b34e87601a5e4347c52c88
+  uses: GorillaStack/github-action-apply-on-merge@v0.1.0
+  with:
+    # The action type (currently "validate" and "apply" are available)
+    action: # default is validate
+    # The name of the tfstate bucket stack
+    stack_name: # default is github-actions-gorillastack-tfstate
+    # The region in which you deployed the tfstate bucket stack
+    aws_default_region: # default is us-east-1
+    # The AWS Access Key Id for the user with privileges to access the tfstate bucket
+    aws_access_key_id: # default is defaulted-for-everything-but-apply
+    # The AWS Secret Access Key for the user with privileges to access the tfstate bucket
+    aws_secret_access_key: # default is defaulted-for-everything-but-apply
+    # GorillaStack API Key, which is read-write or read-only, tied to your user identity
+    gorillastack_api_key: # default is defaulted-for-everything-but-apply
+    # GorillaStack Team Id, sets context of which team/tenant you are targeting
+    gorillastack_team_id: # default is defaulted-for-everything-but-apply
+    
+   - name: Sentry.io CLI Action
+  # You may pin to the exact commit or the version.
+  # uses: NSCoder/sentry@2e15ffc75b0aa0e5c99d792deb5054ee553cf63c
+  uses: NSCoder/sentry@v1.0.1 
+    
+    
+      
